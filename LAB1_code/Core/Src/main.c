@@ -47,8 +47,11 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
 /* USER CODE BEGIN PFP */
-
+void display7SEG_1(int num);
+void display7SEG_2(int num);
+void Ex5(int *time);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -83,8 +86,17 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
+  MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
+  int a = 0;
+  int *time = &a;
+  HAL_GPIO_WritePin(RED_GPIO_Port, RED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(YELLOW_GPIO_Port, YELLOW_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GREEN_GPIO_Port, GREEN_Pin, GPIO_PIN_SET);
 
+  HAL_GPIO_WritePin(RED1_GPIO_Port, RED1_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(YELLOW1_GPIO_Port, YELLOW1_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GREEN1_GPIO_Port, GREEN1_Pin, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -92,7 +104,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  Ex5(time);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -133,8 +145,329 @@ void SystemClock_Config(void)
   }
 }
 
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, RED_Pin|YELLOW_Pin|GREEN_Pin|RED1_Pin
+                          |YELLOW1_Pin|GREEN1_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, a_Pin|b_Pin|c_Pin|d1_Pin
+                          |e1_Pin|f1_Pin|g1_Pin|d_Pin
+                          |e_Pin|f_Pin|g_Pin|a1_Pin
+                          |b1_Pin|c1_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : RED_Pin YELLOW_Pin GREEN_Pin RED1_Pin
+                           YELLOW1_Pin GREEN1_Pin */
+  GPIO_InitStruct.Pin = RED_Pin|YELLOW_Pin|GREEN_Pin|RED1_Pin
+                          |YELLOW1_Pin|GREEN1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : a_Pin b_Pin c_Pin d1_Pin
+                           e1_Pin f1_Pin g1_Pin d_Pin
+                           e_Pin f_Pin g_Pin a1_Pin
+                           b1_Pin c1_Pin */
+  GPIO_InitStruct.Pin = a_Pin|b_Pin|c_Pin|d1_Pin
+                          |e1_Pin|f1_Pin|g1_Pin|d_Pin
+                          |e_Pin|f_Pin|g_Pin|a1_Pin
+                          |b1_Pin|c1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+}
+
 /* USER CODE BEGIN 4 */
 
+void Ex5(int *time)
+{
+	 if((10 - (*time)) >= 6)
+	 {
+		 display7SEG_1((10 - (*time) - 5));
+		 if((10 - (*time) - 7) >= 1)
+	 	 {
+		  	 display7SEG_2((10 - (*time) - 7));
+	 	 }
+		 else
+	  	 {
+		  	 display7SEG_2((10 - (*time) - 5));
+	  	 }
+	 }
+	 else
+	 {
+		 display7SEG_2((10 - (*time) + 5 - 5));
+		 if((10 - (*time) + 5 - 7) >= 1)
+	 	 {
+		  	 display7SEG_1((10 - (*time) + 5 - 7));
+	 	 }
+		 else
+	  	 {
+		  	 display7SEG_1((10 - (*time) + 5 - 5));
+	  	 }
+	 }
+
+	 (*time)++;
+	 HAL_Delay(1000);
+
+	 switch (*time)
+	 {
+	 case 3:
+	 {
+		 HAL_GPIO_TogglePin(GREEN1_GPIO_Port, GREEN1_Pin);
+		 HAL_GPIO_TogglePin(YELLOW1_GPIO_Port, YELLOW1_Pin);
+		 break;
+	 }
+	 case 5:
+	 {
+		 HAL_GPIO_TogglePin(RED_GPIO_Port, RED_Pin);
+		 HAL_GPIO_TogglePin(GREEN_GPIO_Port, GREEN_Pin);
+
+		 HAL_GPIO_TogglePin(YELLOW1_GPIO_Port, YELLOW1_Pin);
+		 HAL_GPIO_TogglePin(RED1_GPIO_Port, RED1_Pin);
+		 break;
+	 }
+	 case 8:
+	 {
+		 HAL_GPIO_TogglePin(GREEN_GPIO_Port, GREEN_Pin);
+		 HAL_GPIO_TogglePin(YELLOW_GPIO_Port, YELLOW_Pin);
+		 break;
+	 }
+	 case 10:
+	 {
+		 HAL_GPIO_TogglePin(YELLOW_GPIO_Port, YELLOW_Pin);
+		 HAL_GPIO_TogglePin(RED_GPIO_Port, RED_Pin);
+
+		 HAL_GPIO_TogglePin(RED1_GPIO_Port, RED1_Pin);
+		 HAL_GPIO_TogglePin(GREEN1_GPIO_Port, GREEN1_Pin);
+		 (*time) = 0;
+		 break;
+	 }
+	 }
+
+}
+
+void display7SEG_1(int num)
+{
+	HAL_GPIO_WritePin(a_GPIO_Port, a_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(b_GPIO_Port, b_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(c_GPIO_Port, c_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(d_GPIO_Port, d_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(e_GPIO_Port, e_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(f_GPIO_Port, f_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(g_GPIO_Port, g_Pin, GPIO_PIN_SET);
+
+	switch (num)
+	{
+	case 0:
+	{
+		HAL_GPIO_TogglePin(a_GPIO_Port, a_Pin);
+		HAL_GPIO_TogglePin(b_GPIO_Port, b_Pin);
+		HAL_GPIO_TogglePin(c_GPIO_Port, c_Pin);
+		HAL_GPIO_TogglePin(d_GPIO_Port, d_Pin);
+		HAL_GPIO_TogglePin(e_GPIO_Port, e_Pin);
+		HAL_GPIO_TogglePin(f_GPIO_Port, f_Pin);
+		break;
+	}
+	case 1:
+	{
+		HAL_GPIO_TogglePin(b_GPIO_Port, b_Pin);
+		HAL_GPIO_TogglePin(c_GPIO_Port, c_Pin);
+		break;
+	}
+	case 2:
+	{
+		HAL_GPIO_TogglePin(a_GPIO_Port, a_Pin);
+		HAL_GPIO_TogglePin(b_GPIO_Port, b_Pin);
+		HAL_GPIO_TogglePin(d_GPIO_Port, d_Pin);
+		HAL_GPIO_TogglePin(e_GPIO_Port, e_Pin);
+		HAL_GPIO_TogglePin(g_GPIO_Port, g_Pin);
+		break;
+	}
+	case 3:
+	{
+		HAL_GPIO_TogglePin(a_GPIO_Port, a_Pin);
+		HAL_GPIO_TogglePin(b_GPIO_Port, b_Pin);
+		HAL_GPIO_TogglePin(c_GPIO_Port, c_Pin);
+		HAL_GPIO_TogglePin(d_GPIO_Port, d_Pin);
+		HAL_GPIO_TogglePin(g_GPIO_Port, g_Pin);
+		break;
+	}
+	case 4:
+	{
+		HAL_GPIO_TogglePin(b_GPIO_Port, b_Pin);
+		HAL_GPIO_TogglePin(c_GPIO_Port, c_Pin);
+		HAL_GPIO_TogglePin(f_GPIO_Port, f_Pin);
+		HAL_GPIO_TogglePin(g_GPIO_Port, g_Pin);
+		break;
+	}
+	case 5:
+	{
+		HAL_GPIO_TogglePin(a_GPIO_Port, a_Pin);
+		HAL_GPIO_TogglePin(c_GPIO_Port, c_Pin);
+		HAL_GPIO_TogglePin(d_GPIO_Port, d_Pin);
+		HAL_GPIO_TogglePin(f_GPIO_Port, f_Pin);
+		HAL_GPIO_TogglePin(g_GPIO_Port, g_Pin);
+		break;
+	}
+	case 6:
+	{
+		HAL_GPIO_TogglePin(a_GPIO_Port, a_Pin);
+		HAL_GPIO_TogglePin(c_GPIO_Port, c_Pin);
+		HAL_GPIO_TogglePin(d_GPIO_Port, d_Pin);
+		HAL_GPIO_TogglePin(e_GPIO_Port, e_Pin);
+		HAL_GPIO_TogglePin(f_GPIO_Port, f_Pin);
+		HAL_GPIO_TogglePin(g_GPIO_Port, g_Pin);
+		break;
+	}
+	case 7:
+	{
+		HAL_GPIO_TogglePin(a_GPIO_Port, a_Pin);
+		HAL_GPIO_TogglePin(b_GPIO_Port, b_Pin);
+		HAL_GPIO_TogglePin(c_GPIO_Port, c_Pin);
+		break;
+	}
+	case 8:
+	{
+		HAL_GPIO_TogglePin(a_GPIO_Port, a_Pin);
+		HAL_GPIO_TogglePin(b_GPIO_Port, b_Pin);
+		HAL_GPIO_TogglePin(c_GPIO_Port, c_Pin);
+		HAL_GPIO_TogglePin(d_GPIO_Port, d_Pin);
+		HAL_GPIO_TogglePin(e_GPIO_Port, e_Pin);
+		HAL_GPIO_TogglePin(f_GPIO_Port, f_Pin);
+		HAL_GPIO_TogglePin(g_GPIO_Port, g_Pin);
+		break;
+	}
+	case 9:
+	{
+		HAL_GPIO_TogglePin(a_GPIO_Port, a_Pin);
+		HAL_GPIO_TogglePin(b_GPIO_Port, b_Pin);
+		HAL_GPIO_TogglePin(c_GPIO_Port, c_Pin);
+		HAL_GPIO_TogglePin(d_GPIO_Port, d_Pin);
+		HAL_GPIO_TogglePin(f_GPIO_Port, f_Pin);
+		HAL_GPIO_TogglePin(g_GPIO_Port, g_Pin);
+		break;
+	}
+	}
+}
+
+void display7SEG_2(int num)
+{
+	HAL_GPIO_WritePin(a1_GPIO_Port, a1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(b1_GPIO_Port, b1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(c1_GPIO_Port, c1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(d1_GPIO_Port, d1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(e1_GPIO_Port, e1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(f1_GPIO_Port, f1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(g1_GPIO_Port, g1_Pin, GPIO_PIN_SET);
+
+	switch (num)
+	{
+	case 0:
+	{
+		HAL_GPIO_TogglePin(a1_GPIO_Port, a1_Pin);
+		HAL_GPIO_TogglePin(b1_GPIO_Port, b1_Pin);
+		HAL_GPIO_TogglePin(c1_GPIO_Port, c1_Pin);
+		HAL_GPIO_TogglePin(d1_GPIO_Port, d1_Pin);
+		HAL_GPIO_TogglePin(e1_GPIO_Port, e1_Pin);
+		HAL_GPIO_TogglePin(f1_GPIO_Port, f1_Pin);
+		break;
+	}
+	case 1:
+	{
+		HAL_GPIO_TogglePin(b1_GPIO_Port, b1_Pin);
+		HAL_GPIO_TogglePin(c1_GPIO_Port, c1_Pin);
+		break;
+	}
+	case 2:
+	{
+		HAL_GPIO_TogglePin(a1_GPIO_Port, a1_Pin);
+		HAL_GPIO_TogglePin(b1_GPIO_Port, b1_Pin);
+		HAL_GPIO_TogglePin(d1_GPIO_Port, d1_Pin);
+		HAL_GPIO_TogglePin(e1_GPIO_Port, e1_Pin);
+		HAL_GPIO_TogglePin(g1_GPIO_Port, g1_Pin);
+		break;
+	}
+	case 3:
+	{
+		HAL_GPIO_TogglePin(a1_GPIO_Port, a1_Pin);
+		HAL_GPIO_TogglePin(b1_GPIO_Port, b1_Pin);
+		HAL_GPIO_TogglePin(c1_GPIO_Port, c1_Pin);
+		HAL_GPIO_TogglePin(d1_GPIO_Port, d1_Pin);
+		HAL_GPIO_TogglePin(g1_GPIO_Port, g1_Pin);
+		break;
+	}
+	case 4:
+	{
+		HAL_GPIO_TogglePin(b1_GPIO_Port, b1_Pin);
+		HAL_GPIO_TogglePin(c1_GPIO_Port, c1_Pin);
+		HAL_GPIO_TogglePin(f1_GPIO_Port, f1_Pin);
+		HAL_GPIO_TogglePin(g1_GPIO_Port, g1_Pin);
+		break;
+	}
+	case 5:
+	{
+		HAL_GPIO_TogglePin(a1_GPIO_Port, a1_Pin);
+		HAL_GPIO_TogglePin(c1_GPIO_Port, c1_Pin);
+		HAL_GPIO_TogglePin(d1_GPIO_Port, d1_Pin);
+		HAL_GPIO_TogglePin(f1_GPIO_Port, f1_Pin);
+		HAL_GPIO_TogglePin(g1_GPIO_Port, g1_Pin);
+		break;
+	}
+	case 6:
+	{
+		HAL_GPIO_TogglePin(a1_GPIO_Port, a1_Pin);
+		HAL_GPIO_TogglePin(c1_GPIO_Port, c1_Pin);
+		HAL_GPIO_TogglePin(d1_GPIO_Port, d1_Pin);
+		HAL_GPIO_TogglePin(e1_GPIO_Port, e1_Pin);
+		HAL_GPIO_TogglePin(f1_GPIO_Port, f1_Pin);
+		HAL_GPIO_TogglePin(g1_GPIO_Port, g1_Pin);
+		break;
+	}
+	case 7:
+	{
+		HAL_GPIO_TogglePin(a1_GPIO_Port, a1_Pin);
+		HAL_GPIO_TogglePin(b1_GPIO_Port, b1_Pin);
+		HAL_GPIO_TogglePin(c1_GPIO_Port, c1_Pin);
+		break;
+	}
+	case 8:
+	{
+		HAL_GPIO_TogglePin(a1_GPIO_Port, a1_Pin);
+		HAL_GPIO_TogglePin(b1_GPIO_Port, b1_Pin);
+		HAL_GPIO_TogglePin(c1_GPIO_Port, c1_Pin);
+		HAL_GPIO_TogglePin(d1_GPIO_Port, d1_Pin);
+		HAL_GPIO_TogglePin(e1_GPIO_Port, e1_Pin);
+		HAL_GPIO_TogglePin(f1_GPIO_Port, f1_Pin);
+		HAL_GPIO_TogglePin(g1_GPIO_Port, g1_Pin);
+		break;
+	}
+	case 9:
+	{
+		HAL_GPIO_TogglePin(a1_GPIO_Port, a1_Pin);
+		HAL_GPIO_TogglePin(b1_GPIO_Port, b1_Pin);
+		HAL_GPIO_TogglePin(c1_GPIO_Port, c1_Pin);
+		HAL_GPIO_TogglePin(d1_GPIO_Port, d1_Pin);
+		HAL_GPIO_TogglePin(f1_GPIO_Port, f1_Pin);
+		HAL_GPIO_TogglePin(g1_GPIO_Port, g1_Pin);
+		break;
+	}
+	}
+}
 /* USER CODE END 4 */
 
 /**
