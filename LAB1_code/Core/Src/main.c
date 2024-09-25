@@ -36,7 +36,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-void display7SEG(int* num);
+void display7SEG(int num);
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -86,8 +86,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-  int a = 0;
-  int *counter = &a;
+  int counter = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -95,9 +94,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  if(*counter >= 10) (*counter) = 0;
-	  display7SEG(counter);
-	  (*counter)++;
+	  if(counter >= 10) counter = 0;
+	  display7SEG(counter++);
 	  HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
   }
@@ -167,7 +165,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void display7SEG(int* num)
+void display7SEG(int num)
 {
 	HAL_GPIO_WritePin(a_GPIO_Port, a_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(b_GPIO_Port, b_Pin, GPIO_PIN_SET);
@@ -177,7 +175,7 @@ void display7SEG(int* num)
 	HAL_GPIO_WritePin(f_GPIO_Port, f_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(g_GPIO_Port, g_Pin, GPIO_PIN_SET);
 
-	switch (*num)
+	switch (num)
 	{
 	case 0:
 	{
