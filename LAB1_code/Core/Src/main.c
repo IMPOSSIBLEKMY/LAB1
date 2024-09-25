@@ -173,7 +173,22 @@ void Ex2(int *time)
 	 {
 	 case 5:
 	 {
-		 HAL_GPIO_TogglePin(RED, RED_PIN);
+		 HAL_GPIO_TogglePin(RED_GPIO_Port, RED_Pin);
+		 HAL_GPIO_TogglePin(GREEN_GPIO_Port, GREEN_Pin);
+		 break;
+	 }
+	 case 8:
+	 {
+		 HAL_GPIO_TogglePin(GREEN_GPIO_Port, GREEN_Pin);
+		 HAL_GPIO_TogglePin(YELLOW_GPIO_Port, YELLOW_Pin);
+		 break;
+	 }
+	 case 10:
+	 {
+		 HAL_GPIO_TogglePin(YELLOW_GPIO_Port, YELLOW_Pin);
+		 HAL_GPIO_TogglePin(RED_GPIO_Port, RED_Pin);
+		 (*time) = 0;
+		 break;
 	 }
 	 }
 }
